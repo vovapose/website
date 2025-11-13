@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Кафедра О7</title>
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ_яндекс_карт&lang=ru_RU" type="text/javascript"></script>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <div class="container">
+   <div class="top-panel">
+      <div class="logo">
+        <div class="logo">
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="45" fill="#15469D" stroke="#0d3a7a" stroke-width="2"/>
+    <text x="50" y="65" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="40" font-weight="bold">О7</text>
+  </svg>
+  <span>Кафедра О7</span>
+</div>
+      </div>
+      <div class="user-profile" id="user-profile">
+        <div class="notification-bell" id="notification-bell" style="display: none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+        </div>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="user-profile-text">Личный кабинет</span>
+      </div>
+    </div>
+
+    <nav class="main-menu" aria-label="Главное меню">
+      <ul>
+        <li><a href="/">Главная</a></li>
+        <li><a href="/#about">О кафедре</a></li>
+        <li><a href="/#education">Образование</a></li>
+        <li><a href="/#science">Наука</a></li>
+        <li><a href="/#events">Мероприятия</a></li>
+        
+      </ul>
+    </nav>
+
+    <div id="notifications-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Уведомления</h3>
+          <button class="close-modal" data-modal="notifications-modal">&times;</button>
+        </div>
+        <div class="notifications-list" id="notifications-list">
+        </div>
+      </div>
+    </div>
+
+    <div id="schedule-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Выберите тип расписания</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-options">
+          <a href="https://voenmeh.ru/prepodavatelyam/raspisanie-prepodavatelej" target="_blank" class="modal-option">
+            <div class="modal-option-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="modal-option-text">
+              <h4>Расписание по группам</h4>
+             <p>Просмотр расписания занятий для всех учебных групп кафедры</p>
+            </div>
+          </a>
+          <a href="https://voenmeh.ru/prepodavatelyam/raspisanie-prepodavatelej" target="_blank" class="modal-option">
+            <div class="modal-option-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="modal-option-text">
+              <h4>Расписание преподавателей</h4>
+              <p>Просмотр расписания занятий для преподавателей кафедры</p>
+            </div>
+          </a>
+          <a href="/consultations" id="consultations-link" class="modal-option">
+            <div class="modal-option-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 12H8.01M12 12H12.01M16 12H16.01M21 12C21 16.4183 16.9706 20 12 20C10.4607 20 9.01172 19.6565 7.74467 19.0511L3 20L4.39499 16.28C3.51156 15.0423 3 13.5743 3 12C3 7.58172 7.02944 4 12 4C16.9706 4 21 7.58172 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="modal-option-text">
+              <h4>Консультации</h4>
+              <p>Расписание консультаций преподавателей кафедры</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div> 
+
+
+    <!-- Главная страница -->
+    <div id="main-content">
+      <div class="grid-main">
+        <div class="about-block">
+          <div class="about-header">
+            <h2>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              </svg>
+              Кафедра О7
+            </h2>
+            <p>Современный научно-образовательный центр в области IT-технологий</p>
+          </div>
+          
+          <div class="about-content">
+            <p class="about-text">
+              Наша кафедра готовит специалистов в области информатики, компьютерных наук и искусственного интеллекта. 
+              Мы объединяем преподавателей, исследователей и студентов, работающих над передовыми проектами в области 
+              программирования, анализа данных, кибербезопасности и машинного обучения.
+            </p>
+            
+            <div class="about-features">
+              <div class="feature">
+                <h4>Бакалавриат</h4>
+                <p>4 года обучения </p>
+                <p>3 профиля подготовки</p>
+              </div>
+              <div class="feature">
+                <h4>Магистратура</h4>
+                <p>2 года</p> 
+                <p>2 магистерских программ</p>
+              </div>
+              <div class="feature">
+                <h4>Публикации</h4>
+                  <p>Более 50 научных статей в год</p>
+              </div>
+            </div>
+            
+            <p class="about-text">
+              Кафедра сотрудничает с ведущими IT-компаниями, что позволяет нашим студентам проходить практику 
+              и трудоустраиваться в крупнейшие технологические компании страны.
+            </p>
+
+            <div class="about-actions">
+              <button class="btn primary" onclick="app.showContactsPage()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Связаться с нами
+              </button>
+              
+            </div>
+          </div>
+        </div>
+
+        <div class="block schedule-block">
+          <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=300&q=80" alt="расписание">
+          <div class="block-content">
+            <h3>Расписание занятий</h3>
+            <p>Актуальное расписание лекций, семинаров и консультаций для всех курсов.</p>
+            <div class="block-meta">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 8V12L15 15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              На текущую неделю
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section id="education" class="programs-section">
+        <div class="section-container">
+          <h3>Образовательные программы</h3>
+          <p>Мы предлагаем современные образовательные программы, соответствующие требованиям IT-индустрии.</p>
+          
+          <div class="programs-grid">
+            <div class="program-card">
+              <div class="program-header">
+                <span class="program-type">Бакалавриат</span>
+                <span class="program-forms">Форма: очная, заочная, очно-заочная</span>
+              </div>
+              <div class="program-code">09.03.04 «Программная инженерия»</div>
+              <div class="program-name">Разработка программно-информационных систем</div>
+            </div>
+
+            <div class="program-card">
+              <div class="program-header">
+                <span class="program-type">Бакалавриат</span>
+                <span class="program-forms">Форма: очная</span>
+              </div>
+              <div class="program-code">09.03.02 «Информационные системы и технологии»</div>
+              <div class="program-name">Информационная безопасность</div>
+            </div>
+
+            <div class="program-card">
+              <div class="program-header">
+                <span class="program-type">Бакалавриат</span>
+                <span class="program-forms">Форма: очная</span>
+              </div>
+              <div class="program-code">09.03.02 «Информационные системы и технологии»</div>
+              <div class="program-name">Технологии разработки информационных систем</div>
+            </div>
+
+            <div class="program-card">
+              <div class="program-header">
+                <span class="program-type">Магистратура</span>
+                <span class="program-forms">Форма: очная, заочная</span>
+              </div>
+              <div class="program-code">09.04.04 «Программная инженерия»</div>
+              <div class="program-name">Процессы и методы разработки программных продуктов</div>
+            </div>
+
+            <div class="program-card">
+              <div class="program-header">
+                <span class="program-type">Магистратура</span>
+                <span class="program-forms">Форма: очная, заочная</span>
+              </div>
+              <div class="program-code">09.04.04 «Программная инженерия»</div>
+              <div class="program-name">Процессы и методы разработки программного обеспечения</div>
+            </div>
+
+            <div class="program-card">
+              <div class="program-header">
+                <span class="program-type">Аспирантура</span>
+                <span class="program-forms">Форма: очная</span>
+              </div>
+              <div class="program-code">2.2.11 «Информационно-измерительные и управляющие системы»</div>
+              <div class="program-name">Информационно-измерительные и управляющие системы</div>
+            </div>
+
+            <div class="program-card">
+              <div class="program-header">
+                <span class="program-type">Аспирантура</span>
+                <span class="program-forms">Форма: очная</span>
+              </div>
+              <div class="program-code">2.2.9 «Проектирование и технология приборостроения и радиоэлектронной аппаратуры»</div>
+              <div class="program-name">Проектирование и технология приборостроения и радиоэлектронной аппаратуры</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="events" class="events-section">
+        <div class="section-header">
+          <h3>Ближайшие мероприятия</h3>
+          <a href="#" class="view-all">
+          </a>
+        </div>
+        <div class="events-container" id="events-container"></div>
+      </section>
+
+      <section id="science" class="science-section">
+        <div class="section-container">
+          <h3>Научная деятельность</h3>
+          <p>На кафедре ведутся фундаментальные и прикладные исследования в ключевых областях информатики.</p>
+          
+          <div class="science-grid">
+            <div class="science-card">
+              <h4>Искусственный интеллект</h4>
+              <p>Разработка алгоритмов машинного обучения и нейросетевых моделей.</p>
+            </div>
+            <div class="science-card">
+              <h4>Кибербезопасность</h4>
+              <p>Исследования в области защиты информации и сетевой безопасности.</p>
+            </div>
+            <div class="science-card">
+              <h4>Большие данные</h4>
+              <p>Анализ и обработка больших объемов структурированных и неструктурированных данных.</p>
+            </div>
+            <div class="science-card">
+              <h4>Программная инженерия</h4>
+              <p>Разработка методологий и инструментов для создания сложных программных систем.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Страница контактов -->
+    <div id="contacts-page" class="contacts-page" style="display: none;">
+      <div class="section-container">
+        <a href="/" class="back-button" id="contacts-back-button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Назад на главную
+        </a>
+        
+        <h3>Форма для связи и расположение кафедры</h3>
+        
+        <div class="contacts-layout">
+          <div class="map-container expanded">
+            <div id="map"></div>
+          </div>
+          
+          <div class="contact-form expanded">
+            <h4 class="form-title">Связаться с нами</h4>
+            <form id="feedback-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">Ваше имя *</label>
+                  <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                  <label for="email">Корпоративная почта *</label>
+                  <input type="email" id="email" name="email" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="subject">Тема сообщения</label>
+                <input type="text" id="subject" name="subject">
+              </div>
+              <div class="form-group">
+                <label for="message">Сообщение *</label>
+                <textarea id="message" name="message" required></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn primary">Отправить сообщение</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        
+      </div>
+    </div>
+
+    <!-- Страница консультаций -->
+    <div id="consultations-page" class="consultations-page" style="display: none;">
+      <div class="section-container">
+        <a href="/" class="back-button" id="back-button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Назад на главную
+        </a>
+        
+        <h3>Консультации преподавателей</h3>
+        <p>Расписание консультаций преподавателей кафедры О7 на текущий семестр</p>
+        
+        <div class="google-sheets-container">
+          <iframe class="google-sheets-iframe" src="https://docs.google.com/spreadsheets/d/1NKYx-tfkaMPlytM8sCLWs0M3mS3jwqtXgh6sBw151Pk/edit?hl=ru&gid=0#gid=0"></iframe>
+        </div>
+        
+        <div class="consultations-note">
+          <h4>Примечание:</h4>
+          <p>
+            Для записи на консультацию необходимо предварительно связаться с преподавателем по электронной почте. 
+            В случае изменения расписания информация будет обновлена в таблице выше.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Модальные окна -->
+    <div class="modal" id="login-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Вход в аккаунт</h3>
+          <button class="close-modal" data-modal="login-modal">&times;</button>
+        </div>
+        <div style="padding: 0 24px 24px;">
+          <form id="login-form">
+            <div class="form-group">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" required placeholder="your@email.com">
+            </div>
+
+            <div class="form-group">
+              <label for="login-password">Пароль</label>
+              <input type="password" id="login-password" required minlength="6" placeholder="Введите ваш пароль">
+            </div>
+
+            <button type="submit" class="btn primary">Войти в аккаунт</button>
+
+            <p class="switch-auth">
+              Нет аккаунта? 
+              <a href="#" onclick="app.switchToRegister()">Зарегистрироваться</a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="register-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Регистрация</h3>
+          <button class="close-modal" data-modal="register-modal">&times;</button>
+        </div>
+        <div style="padding: 0 24px 24px;">
+          <form id="register-form">
+            <div class="form-group">
+              <label for="register-email">Email</label>
+              <input type="email" id="register-email" required placeholder="your@email.com">
+            </div>
+
+            <div class="form-group">
+              <label for="register-username">Имя пользователя</label>
+              <input type="text" id="register-username" required minlength="3" placeholder="Придумайте имя пользователя">
+            </div>
+
+            <div class="form-group">
+              <label for="register-password">Пароль</label>
+              <input type="password" id="register-password" required minlength="6" placeholder="Не менее 6 символов">
+            </div>
+
+            <div class="form-group">
+              <label for="register-password-repeat">Повторите пароль</label>
+              <input type="password" id="register-password-repeat" required minlength="6" placeholder="Повторите ваш пароль">
+            </div>
+
+            <div id="register-success" class="success-msg" style="display:none;">
+               Успешная регистрация!
+            </div>
+
+            <button type="submit" class="btn primary">Создать аккаунт</button>
+
+            <p class="switch-auth">
+              Уже есть аккаунт? 
+              <a href="#" onclick="app.switchToLogin()">Войти</a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="profile-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Личный кабинет</h3>
+          <button class="close-modal" data-modal="profile-modal">&times;</button>
+        </div>
+        <div class="profile-content">
+          <div class="profile-info">
+            <h4 id="profile-username">Имя пользователя</h4>
+            <p id="profile-email">email@voenmeh.ru</p>
+            
+          </div>
+          <div class="profile-actions">
+            <button class="btn secondary" id="logout-btn">Выйти</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer style="background: var(--blue); color: white;">
+      <div class="footer-columns">
+        <div class="footer-column">
+          <h4>Телефон</h4>
+          <p>+7 (800) 555-35-35<br>+7 (800)555-35-35</p>
+        </div>
+        <div class="footer-column">
+          <h4>Email</h4>
+          <p>kafedra07@voenmeh.ru<br>info@voenmeh.ru</p>
+        </div>
+      </div>
+      <div class="copyright" style="color: rgba(255,255,255,0.7);">
+        © 2025 Кафедра О7. Все права защищены.
+      </div>
+    </footer>
+  </div>
+  <script src="assets/script.js"></script>
+</body>
+</html>
