@@ -3,7 +3,7 @@ import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import bcrypt from 'bcryptjs'; // ИЗМЕНЕНИЕ: bcryptjs вместо bcrypt
+import bcrypt from 'bcryptjs';
 import pkg from 'pg';
 import express from "express";
 import { json } from "body-parser";
@@ -25,8 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Статические файлы - правильные пути для вашей структуры
-app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
-app.use(express.static(path.join(__dirname, '..')));
+//app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+//app.use(express.static(path.join(__dirname, '..')));
 
 // Сессии
 app.use(session({ 
