@@ -3,42 +3,44 @@ import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import pkg from 'pg';
 
 dotenv.config();
 const { Pool } = pkg;
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Настройка парсера тела запроса ДО статических файлов
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Статические файлы
-app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
-app.use('/', express.static(path.join(__dirname, '..')));
+// Статические файлы - правильные пути для Vercel
+app.use('/assets', express.static(path.join(process.cwd(), 'assets')));
+app.use(express.static(path.join(process.cwd())));
 
 // Сессии
 app.use(session({ 
     secret: process.env.SESSION_SECRET || 'dev-secret-key-2024', 
     resave: false, 
     saveUninitialized: false,
-    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }
+    cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 24 * 60 * 60 * 1000 }
 }));
 
+// База данных
 function createDbPool() {
     if (process.env.DATABASE_URL) {
-        console.log('Используется DATABASE_URL из .env');
+        console.log('Using DATABASE_URL from environment');
         return new Pool({
             connectionString: process.env.DATABASE_URL,
-            ssl: { rejectUnauthorized: false }  // важно для Supabase
+            ssl: { rejectUnauthorized: false }
         });
     }
 
-    console.log('Используются локальные настройки PostgreSQL');
+    console.log('Using local PostgreSQL settings');
     return new Pool({
         user: process.env.DB_USER || 'postgres',
         host: process.env.DB_HOST || 'localhost',
@@ -48,16 +50,14 @@ function createDbPool() {
     });
 }
 
-
 const pool = createDbPool();
 
-// Проверка подключения к базе данных
+// Проверка подключения к БД
 async function testConnection() {
     try {
         const client = await pool.connect();
-        console.log(' Успешное подключение к PostgreSQL');
+        console.log('✅ PostgreSQL connected successfully');
         
-        // Проверяем существование таблицы users
         const tableCheck = await client.query(`
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
@@ -67,7 +67,7 @@ async function testConnection() {
         `);
         
         if (!tableCheck.rows[0].exists) {
-            console.log(' Создаем таблицу users...');
+            console.log('📊 Creating users table...');
             await client.query(`
                 CREATE TABLE users (
                     id SERIAL PRIMARY KEY,
@@ -78,40 +78,31 @@ async function testConnection() {
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             `);
-            console.log(' Таблица users создана');
+            console.log('✅ Users table created');
         } else {
-            console.log(' Таблица users уже существует');
+            console.log('✅ Users table exists');
         }
         
         client.release();
     } catch (err) {
-        console.error(' Ошибка подключения к базе данных:', err.message);
-        console.log(' Проверьте:');
-        console.log('  1. Запущен ли PostgreSQL сервер');
-        console.log('  2. Правильность учетных данных в .env файле');
-        console.log('  3. Существует ли база данных');
-        
-        // Создаем временное хранилище в памяти для разработки
-        console.log(' Используем временное хранилище в памяти...');
+        console.error('❌ Database connection error:', err.message);
     }
 }
 
-// Инициализация подключения
 testConnection();
 
-// Middleware для логирования запросов
+// Middleware для логирования
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} ${req.method} ${req.path}`);
     next();
 });
 
-// Регистрация
+// API Routes
 app.post('/api/register', async (req, res) => {
     const { email, username, password, passwordRepeat } = req.body;
 
-    console.log(' Регистрация:', { email, username });
+    console.log('Register:', { email, username });
 
-    // Валидация
     if (!email || !username || !password || !passwordRepeat) {
         return res.status(400).json({ error: 'Все поля обязательны' });
     }
@@ -124,13 +115,11 @@ app.post('/api/register', async (req, res) => {
         return res.status(400).json({ error: 'Пароль должен содержать минимум 6 символов' });
     }
 
-    // Проверка email voenmeh.ru
     if (!email.includes('@voenmeh.ru')) {
         return res.status(400).json({ error: 'Используйте корпоративную почту @voenmeh.ru' });
     }
 
     try {
-        // Проверяем существование пользователя
         const existingUser = await pool.query(
             'SELECT id FROM users WHERE email = $1 OR username = $2',
             [email.toLowerCase(), username]
@@ -140,10 +129,8 @@ app.post('/api/register', async (req, res) => {
             return res.status(400).json({ error: 'Пользователь с таким email или именем уже существует' });
         }
 
-        // Хешируем пароль
         const hashedPassword = await bcrypt.hash(password, 12);
         
-        // Создаем пользователя
         const result = await pool.query(
             'INSERT INTO users (email, username, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, email, username, role',
             [email.toLowerCase(), username, hashedPassword, 'student']
@@ -152,7 +139,7 @@ app.post('/api/register', async (req, res) => {
         const user = result.rows[0];
         req.session.userId = user.id;
         
-        console.log(' Пользователь зарегистрирован:', user.email);
+        console.log('User registered:', user.email);
         
         return res.json({ 
             success: true, 
@@ -164,16 +151,15 @@ app.post('/api/register', async (req, res) => {
             }
         });
     } catch (err) {
-        console.error(' Ошибка регистрации:', err.message);
+        console.error('Registration error:', err.message);
         return res.status(500).json({ error: 'Ошибка сервера при регистрации' });
     }
 });
 
-// Вход
 app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
     
-    console.log(' Вход:', { email });
+    console.log('Login:', { email });
 
     if (!email || !password) {
         return res.status(400).json({ error: 'Email и пароль обязательны' });
@@ -198,7 +184,7 @@ app.post('/api/login', async (req, res) => {
         
         req.session.userId = user.id;
         
-        console.log(' Пользователь вошел:', user.email);
+        console.log('User logged in:', user.email);
         
         return res.json({ 
             success: true,
@@ -210,38 +196,22 @@ app.post('/api/login', async (req, res) => {
             }
         });
     } catch (err) {
-        console.error(' Ошибка входа:', err.message);
+        console.error('Login error:', err.message);
         return res.status(500).json({ error: 'Ошибка сервера при входе' });
     }
 });
 
-// Выход
 app.post('/api/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
-            console.error(' Ошибка при выходе:', err);
+            console.error('Logout error:', err);
             return res.status(500).json({ error: 'Ошибка при выходе' });
         }
-        console.log('👋 Пользователь вышел из системы');
+        console.log('User logged out');
         res.json({ success: true });
     });
 });
-// Маршрут для страницы контактов
-app.get('/contacts', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
-});
 
-// Маршрут для страницы консультаций
-app.get('/consultations', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
-});
-
-// Главная страница
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
-});
-
-// Получение информации о текущем пользователе
 app.get('/api/me', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'Не авторизован' });
@@ -259,12 +229,11 @@ app.get('/api/me', async (req, res) => {
         
         res.json(result.rows[0]);
     } catch (err) {
-        console.error(' Ошибка получения пользователя:', err.message);
+        console.error('Get user error:', err.message);
         res.status(500).json({ error: 'Ошибка сервера' });
     }
 });
 
-// Проверка здоровья API
 app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK', 
@@ -273,18 +242,22 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Маршруты для статических файлов
+// Serve HTML files
+app.get('/contacts', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'index.html'));
+});
+
+app.get('/consultations', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'index.html'));
+});
+
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
+    res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'index.html'));
+    res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(` Сервер запущен на порту ${PORT}`);
-    console.log(` Требования к регистрации: email @voenmeh.ru`);
-    console.log(` http://localhost:${PORT}`);
-});
+// Экспорт для Vercel
+export default app;
