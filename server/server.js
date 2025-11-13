@@ -5,6 +5,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs'; // ИЗМЕНЕНИЕ: bcryptjs вместо bcrypt
 import pkg from 'pg';
+import express from "express";
+import { json } from "body-parser";
+
+
+
 
 dotenv.config();
 const { Pool } = pkg;
@@ -13,6 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.use(json());
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -258,6 +264,15 @@ app.get('/', (req, res) => {
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
+
+export default app;
+
+// Конфиг для Vercel
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
