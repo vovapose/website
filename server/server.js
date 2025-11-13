@@ -3,7 +3,7 @@ import session from 'express-session';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs'; // ИЗМЕНЕНИЕ: bcryptjs вместо bcrypt
 import pkg from 'pg';
 
 dotenv.config();
@@ -18,9 +18,9 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Статические файлы - правильные пути для Vercel
-app.use('/assets', express.static(path.join(process.cwd(), 'assets')));
-app.use(express.static(path.join(process.cwd())));
+// Статические файлы - правильные пути для вашей структуры
+app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+app.use(express.static(path.join(__dirname, '..')));
 
 // Сессии
 app.use(session({ 
@@ -244,20 +244,24 @@ app.get('/api/health', (req, res) => {
 
 // Serve HTML files
 app.get('/contacts', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 app.get('/consultations', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
-// Экспорт для Vercel
-export default app;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📧 Registration requires: @voenmeh.ru email`);
+    console.log(`🔗 http://localhost:${PORT}`);
+});
