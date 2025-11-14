@@ -15,42 +15,48 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Подключение к Supabase
-const pool = new Pool({
+// Конфигурация подключения к Supabase
+const poolConfig = {
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
+};
+
+// Важно: Supabase требует SSL в production
+if (process.env.NODE_ENV === 'production') {
+  poolConfig.ssl = {
+    rejectUnauthorized: false
+  };
+}
+
+const pool = new Pool(poolConfig);
 
 // Middleware
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'fallback-secret',
+  secret: process.env.SESSION_SECRET || 'fallback-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 24 * 60 * 60 * 1000 } // 24 часа
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production', 
+    maxAge: 24 * 60 * 60 * 1000 
+  }
 }));
 
-// Проверка подключения к базе
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('Ошибка подключения к базе данных:', err);
-  } else {
+// Проверка подключения к базе при старте
+const testConnection = async () => {
+  try {
+    const client = await pool.connect();
     console.log('✅ Успешное подключение к Supabase PostgreSQL');
-    release();
-  }
-});
-
-// Middleware для проверки аутентификации
-const requireAuth = (req, res, next) => {
-  if (req.session.userId) {
-    next();
-  } else {
-    res.status(401).json({ error: 'Требуется аутентификация' });
+    client.release();
+  } catch (error) {
+    console.error('❌ Ошибка подключения к базе:', error.message);
+    console.log('Проверь DATABASE_URL в переменных окружения Vercel');
   }
 };
 
-// API routes
+testConnection();
+
+// API routes с улучшенной обработкой ошибок
 app.get('/api/me', async (req, res) => {
   if (!req.session.userId) {
     return res.status(401).json({ error: 'Not authenticated' });
@@ -69,7 +75,10 @@ app.get('/api/me', async (req, res) => {
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Database error',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
@@ -128,7 +137,10 @@ app.post('/api/register', async (req, res) => {
 
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: 'Ошибка при регистрации' });
+    res.status(500).json({ 
+      error: 'Ошибка при регистрации',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Check database connection'
+    });
   }
 });
 
@@ -171,7 +183,10 @@ app.post('/api/login', async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Ошибка при входе' });
+    res.status(500).json({ 
+      error: 'Ошибка при входе',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Check database connection'
+    });
   }
 });
 
@@ -185,6 +200,24 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
+// Health check endpoint для проверки подключения
+app.get('/api/health', async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ 
+      status: 'OK', 
+      database: 'Connected',
+      environment: process.env.NODE_ENV 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'Error', 
+      database: 'Disconnected',
+      error: error.message 
+    });
+  }
+});
+
 // Serve index.html for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
@@ -192,5 +225,6 @@ app.get('*', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Database: ${process.env.DATABASE_URL ? 'Connected to Supabase' : 'Not configured'}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
+  console.log(`Database URL: ${process.env.DATABASE_URL ? 'Set' : 'Not set'}`);
 });
