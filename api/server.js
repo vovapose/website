@@ -1,127 +1,196 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import pkg from 'pg';
+import bcrypt from 'bcryptjs';
+import session from 'express-session';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+const { Pool } = pkg;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Подключение к Supabase
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+});
+
 // Middleware
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'fallback-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production', maxAge: 24 * 60 * 60 * 1000 } // 24 часа
+}));
 
-// Mock данные для демонстрации
-const users = [
-    {
-        id: 1,
-        email: 'demo@voenmeh.ru',
-        username: 'demo_user',
-        password: 'demo123', // В реальном приложении будет хеш
-        role: 'student'
-    }
-];
+// Проверка подключения к базе
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('Ошибка подключения к базе данных:', err);
+  } else {
+    console.log('✅ Успешное подключение к Supabase PostgreSQL');
+    release();
+  }
+});
 
 // Middleware для проверки аутентификации
 const requireAuth = (req, res, next) => {
-    // В реальном приложении здесь будет проверка сессии/JWT
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ error: 'Not authenticated' });
-    }
+  if (req.session.userId) {
     next();
+  } else {
+    res.status(401).json({ error: 'Требуется аутентификация' });
+  }
 };
 
 // API routes
-app.get('/api/me', (req, res) => {
-    // Заглушка - в реальном приложении будет проверка сессии
-    const token = req.headers.authorization;
-    if (token && token === 'demo-token') {
-        return res.json(users[0]);
+app.get('/api/me', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT id, email, username, role, created_at FROM users WHERE id = $1',
+      [req.session.userId]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    res.status(401).json({ error: 'Not authenticated' });
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-app.post('/api/register', (req, res) => {
-    const { email, username, password, passwordRepeat } = req.body;
-    
-    // Валидация
-    if (!email || !username || !password) {
-        return res.status(400).json({ error: 'Все поля обязательны' });
+app.post('/api/register', async (req, res) => {
+  const { email, username, password, passwordRepeat } = req.body;
+
+  // Валидация
+  if (!email || !username || !password) {
+    return res.status(400).json({ error: 'Все поля обязательны' });
+  }
+
+  if (password !== passwordRepeat) {
+    return res.status(400).json({ error: 'Пароли не совпадают' });
+  }
+
+  if (!email.endsWith('@voenmeh.ru')) {
+    return res.status(400).json({ error: 'Разрешены только email @voenmeh.ru' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Пароль должен быть не менее 6 символов' });
+  }
+
+  try {
+    // Проверяем существующего пользователя
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
     }
-    
-    if (password !== passwordRepeat) {
-        return res.status(400).json({ error: 'Пароли не совпадают' });
-    }
-    
-    if (!email.endsWith('@voenmeh.ru')) {
-        return res.status(400).json({ error: 'Разрешены только email @voenmeh.ru' });
-    }
-    
-    // Проверка существующего пользователя
-    const existingUser = users.find(u => u.email === email);
-    if (existingUser) {
-        return res.status(400).json({ error: 'Пользователь с таким email уже существует' });
-    }
-    
-    // Создание нового пользователя
-    const newUser = {
-        id: users.length + 1,
-        email,
-        username,
-        password, // В реальном приложении нужно хешировать
-        role: 'student',
-        createdAt: new Date()
-    };
-    
-    users.push(newUser);
-    
+
+    // Хешируем пароль
+    const saltRounds = 12;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
+    // Создаем пользователя
+    const result = await pool.query(
+      `INSERT INTO users (email, username, password_hash, role) 
+       VALUES ($1, $2, $3, 'student') 
+       RETURNING id, email, username, role, created_at`,
+      [email, username, passwordHash]
+    );
+
+    const newUser = result.rows[0];
+
+    // Создаем сессию
+    req.session.userId = newUser.id;
+
     res.status(201).json({
-        message: 'Регистрация успешна',
-        user: {
-            id: newUser.id,
-            email: newUser.email,
-            username: newUser.username,
-            role: newUser.role
-        }
+      message: 'Регистрация успешна',
+      user: newUser
     });
+
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Ошибка при регистрации' });
+  }
 });
 
-app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-        return res.status(400).json({ error: 'Email и пароль обязательны' });
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email и пароль обязательны' });
+  }
+
+  try {
+    // Ищем пользователя
+    const result = await pool.query(
+      'SELECT id, email, username, password_hash, role FROM users WHERE email = $1',
+      [email]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: 'Неверный email или пароль' });
     }
-    
-    const user = users.find(u => u.email === email && u.password === password);
-    if (!user) {
-        return res.status(401).json({ error: 'Неверный email или пароль' });
+
+    const user = result.rows[0];
+
+    // Проверяем пароль
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Неверный email или пароль' });
     }
-    
+
+    // Создаем сессию
+    req.session.userId = user.id;
+
+    // Возвращаем пользователя без пароля
+    const { password_hash, ...userWithoutPassword } = user;
+
     res.json({
-        message: 'Вход выполнен успешно',
-        user: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            role: user.role
-        }
+      message: 'Вход выполнен успешно',
+      user: userWithoutPassword
     });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Ошибка при входе' });
+  }
 });
 
 app.post('/api/logout', (req, res) => {
-    // В реальном приложении здесь будет очистка сессии
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Ошибка при выходе' });
+    }
+    res.clearCookie('connect.sid');
     res.json({ message: 'Выход выполнен успешно' });
+  });
 });
 
 // Serve index.html for all other routes
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Demo credentials: demo@voenmeh.ru / demo123`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Database: ${process.env.DATABASE_URL ? 'Connected to Supabase' : 'Not configured'}`);
 });

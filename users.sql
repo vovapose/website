@@ -1,5 +1,3 @@
--- Create DB and table (run in psql)
--- CREATE DATABASE voenmeh;
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   email VARCHAR(255) UNIQUE NOT NULL CHECK (POSITION('@voenmeh.ru' IN email) > 0),
