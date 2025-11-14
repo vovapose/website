@@ -5,7 +5,1920 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Кафедра О7</title>
   <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ_яндекс_карт&lang=ru_RU" type="text/javascript"></script>
-  <link rel="stylesheet" href="/style.css">
+  <style>
+    :root{
+  --blue:#15469D;
+  --dark-blue:#0d3a7a;
+  --light-blue:#e8f1ff;
+  --muted:#f2f6fb;
+  --card-bg:#ffffff;
+  --accent:#e8f1ff;
+  --text-dark:#1a2b4c;
+  --text-muted:#556676;
+  --border:#e6e9ef;
+}
+
+html { 
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8fafc;
+  color: var(--text-dark);
+  line-height: 1.6;
+  font-size: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container { 
+  max-width: 1600px;
+  margin: 0 auto; 
+  background: var(--card-bg); 
+  box-shadow: 0 0 40px rgba(0,0,0,0.05);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Главный контент должен занимать все доступное пространство */
+#main-content {
+  flex: 1;
+}
+
+.consultations-page,
+.contacts-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.consultations-page .section-container,
+.contacts-page .section-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Остальные стили остаются без изменений */
+.top-panel{ 
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between; 
+  padding:20px 30px;
+  background:#fff; 
+  border-bottom:1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+}
+
+.logo {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo svg {
+  width: 38px;
+  height: 38px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.user-profile svg {
+  width: 24px;
+  height: 24px;
+}
+
+.notification-bell {
+  position: relative;
+  margin-left: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff4757;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-menu{ 
+  background:var(--blue); 
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(21,70,157,0.2);
+}
+
+.main-menu ul{ 
+  margin:0; 
+  padding:0; 
+  list-style:none; 
+  display:flex; 
+  justify-content:center; 
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.main-menu a{ 
+  color:#fff; 
+  font-weight:600; 
+  padding:18px 22px;
+  display:inline-block; 
+  text-decoration:none; 
+  border-radius:0;
+  transition: all 0.2s ease;
+  position: relative;
+  font-size: 20px;
+}
+
+.main-menu a:hover{ 
+  background:var(--dark-blue); 
+}
+
+.main-menu a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 22px;
+  right: 22px;
+  height: 3px;
+  background: rgba(255,255,255,0.5);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.main-menu a:hover::after {
+  transform: scaleX(1);
+}
+
+.grid-main{
+  display:grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "about"
+    "schedule";
+  gap:32px;
+  padding:32px;
+  background: #f8fafc;
+  min-height: 60vh;
+}
+
+.about-block {
+  grid-area: about;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(21,70,157,0.08);
+  border: 1px solid var(--border);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.about-header {
+  padding: 24px 30px 20px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--blue), var(--dark-blue));
+  color: white;
+}
+
+.about-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.about-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 20px;
+}
+
+.about-content {
+  padding: 48px 100px 40px 100px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.about-text {
+  margin: 0;
+  text-align: justify;
+  color: var(--text-dark);
+  line-height: 1.7;
+  font-size: 22px;
+}
+
+.about-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px,1fr));
+  padding: 20px;
+  gap: 40px 120px;
+  margin: 48px 0;
+}
+
+.feature {
+  background: var(--light-blue);
+  font-size: 16;
+  border-radius: 5px;
+  padding: 16px 20px;
+  border-left: 5px solid var(--blue);
+}
+
+.feature h4 {
+  margin: 0 0 8px 0;
+  font-size: 26px;
+  color: var(--blue);
+}
+
+.feature p {
+  margin: 0;
+  font-size: 22px;
+  color: var(--text-muted);
+}
+
+.about-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 22px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn.primary {
+  background: var(--blue);
+  color: white;
+}
+
+.btn.primary:hover {
+  background: var(--dark-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21,70,157,0.3);
+}
+
+.btn.secondary {
+  background: transparent;
+  border: 1px solid var(--blue);
+  color: var(--blue);
+}
+
+.btn.secondary:hover {
+  background: var(--light-blue);
+}
+
+.block{ 
+  position:relative; 
+  overflow:hidden; 
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(15,30,60,0.06); 
+  border:1px solid var(--border); 
+  background:#fff; 
+  display:block; 
+  color:inherit; 
+  text-decoration:none; 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.block:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(15,30,60,0.1);
+}
+
+.block img{ 
+  position:absolute; 
+  inset:0; 
+  width:100%; 
+  height:100%; 
+  object-fit:cover; 
+  opacity:0.3;
+}
+
+.block-content{ 
+  position:relative; 
+  padding:24px;
+  background:rgba(255,255,255,0.92); 
+  z-index:5; 
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.block h3 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  color: var(--blue);
+}
+
+.block p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.block-meta {
+  margin-top: auto;
+  padding-top: 16px;
+  font-size: 16px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 30px;
+  border-radius: 16px;
+  width: 85%;
+  max-width: 700px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--blue);
+  font-size: 24px;
+}
+
+.close-modal {
+  background: transparent;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--text-muted);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-modal:hover {
+  color: var(--blue);
+}
+
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-option {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.modal-option:hover {
+  background: var(--light-blue);
+  border-color: var(--blue);
+  transform: translateY(-2px);
+}
+
+.modal-option-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--light-blue);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  color: var(--blue);
+  font-size: 24px;
+}
+
+.modal-option-text {
+  flex: 1;
+}
+
+.modal-option-text h4 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  color: var(--blue);
+}
+
+.modal-option-text p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.breadcrumbs {
+  padding: 20px 30px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--border);
+}
+
+.breadcrumbs ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.breadcrumbs li {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumbs a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs span {
+  color: var(--text-muted);
+}
+
+.breadcrumbs li:not(:last-child)::after {
+  content: "›";
+  margin-left: 8px;
+  color: var(--text-muted);
+}
+
+.consultations-page {
+    padding: 40px 30px;
+    background: #fff;
+    min-height: 70vh;
+}
+
+.google-sheets-container {
+    width: 100%;
+    height: 600px;
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
+}
+
+.google-sheets-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.consultations-note {
+    margin-top: 30px;
+    padding: 20px;
+    background: var(--light-blue);
+    border-radius: 10px;
+    border-left: 4px solid var(--blue);
+}
+
+.consultations-note h4 {
+    color: var(--blue);
+    margin: 0 0 10px 0;
+}
+
+.consultations-note p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.contacts-page {
+    padding: 40px 30px;
+    background: #fff;
+    min-height: 70vh;
+}
+
+.contacts-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    margin-top: 30px;
+}
+
+.map-container {
+    height: 500px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.contact-form {
+    background: var(--light-blue);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    height: fit-content;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.form-title {
+  margin: 0 0 20px 0;
+  color: var(--blue);
+  font-size: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 18px;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 18px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(21, 70, 157, 0.1);
+}
+
+textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.btn.cancel {
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+}
+
+.btn.cancel:hover {
+  background: #f5f5f5;
+}
+
+.contact-form-toggle-container {
+  text-align: center;
+  margin-top: 36px;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #15469D;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  transition: background 0.2s ease;
+  font-size: 18px;
+}
+
+.back-button:hover {
+  background: #0d3a7a;
+}
+
+.programs-section {
+  padding: 40px 30px;
+  background: #fff;
+}
+
+.science-section {
+  padding: 40px 30px;
+  background: #f8fbff;
+}
+
+.events-section{ 
+  background:#f5f8fb; 
+  padding:36px 30px;
+  border-top: 1px solid var(--border);
+}
+
+.section-container {
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.section-container h3 {
+  color: var(--blue);
+  margin: 0 0 16px 0;
+  font-size: 28px;
+}
+
+.section-container p {
+  color: var(--text-muted);
+  margin: 0 0 24px 0;
+  font-size: 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: var(--blue);
+  font-size: 28px;
+}
+
+.view-all {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 24px;
+  margin-top: 30px;
+}
+
+.program-card {
+  background: var(--light-blue);
+  border-radius: 12px;
+  padding: 24px;
+  border-left: 5px solid var(--blue);
+  transition: transform 0.2s ease;
+}
+
+.program-card:hover {
+  transform: translateY(-3px);
+}
+
+.program-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.program-type {
+  background: var(--blue);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.program-forms {
+  color: var(--text-muted);
+  font-size: 16px;
+  text-align: right;
+}
+
+.program-code {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+
+.program-name {
+  font-size: 20px;
+  color: var(--text-dark);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.science-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.science-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 10px;
+  border-left: 5px solid var(--blue);
+}
+
+.science-card h4 {
+  margin: 0 0 10px 0;
+  color: var(--blue);
+  font-size: 20px;
+}
+
+.science-card p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.events-container{ 
+  display:flex; 
+  gap:24px;
+  overflow-x:auto; 
+  padding-bottom:16px;
+}
+
+.event{ 
+  min-width:350px;
+  min-height: 200px;
+  background:#fff; 
+  border-radius:12px;
+  border:1px solid var(--border); 
+  padding:24px;
+  box-shadow: 0 6px 20px rgba(20,70,157,0.03);
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.event:hover {
+  transform: translateY(-3px);
+}
+
+.event-date {
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--blue);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+}
+
+.event-place {
+  color: var(--text-muted);
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.event-desc {
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.notifications-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.notification-item:hover {
+  background: #f8f9fa;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-title {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.notification-text {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.notification-time {
+  color: #999;
+  font-size: 12px;
+}
+
+.profile-content {
+  padding: 20px 0;
+}
+
+.profile-info h4 {
+  margin: 0 0 8px 0;
+  color: var(--blue);
+  font-size: 20px;
+}
+
+.profile-info p {
+  margin: 0 0 8px 0;
+  color: var(--text-muted);
+}
+
+.profile-role {
+  background: var(--light-blue);
+  color: var(--blue);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 14px;
+}
+
+.profile-actions {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.auth-form {
+  padding: 20px 0;
+}
+
+.auth-form .form-group {
+  margin-bottom: 20px;
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.auth-form .form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.switch-auth {
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+}
+
+.switch-auth a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.switch-auth a:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #f5c6cb;
+}
+
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #c3e6cb;
+}
+
+footer{ 
+  background:var(--blue); 
+  color:#fff; 
+  padding:40px 30px;
+  display:flex; 
+  flex-direction: column;
+  gap:40px;
+  font-size:18px;
+  margin-top: auto;
+}
+
+.footer-columns {
+  display: flex;
+  gap: 60px;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.footer-column {
+  flex: 1;
+  min-width: 200px;
+}
+
+footer h4 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+}
+
+footer a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+.copyright {
+  width: 100%;
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  font-size: 17px;
+}
+
+@media (max-width: 900px){
+  .grid-main{ 
+    grid-template-columns: 1fr; 
+    grid-template-areas: 
+      "about"
+      "schedule"; 
+  }
+  .about-features {
+    grid-template-columns: 1fr;
+  }
+  .about-actions {
+    flex-direction: column;
+  }
+  .programs-grid {
+    grid-template-columns: 1fr;
+  }
+  .contacts-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .map-container {
+    height: 300px;
+  }
+  .about-content {
+    padding: 48px 30px 40px 30px;
+  }
+  .footer-columns {
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 600px){
+  .top-panel {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  .main-menu ul {
+    flex-wrap: wrap;
+  }
+  .main-menu a {
+    padding: 14px 16px;
+    font-size: 18px;
+  }
+  .google-sheets-container {
+    height: 300px;
+  }
+  .about-features {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .feature {
+    min-width: auto;
+  }
+  .programs-grid {
+    grid-template-columns: 1fr;
+  }
+  .program-card {
+    min-width: auto;
+  }
+}
+
+@media (min-width: 1800px) {
+  .container {
+    max-width: 1700px;
+  }
+  
+  .about-content {
+    padding: 48px 120px 40px 120px;
+  }
+  
+  .programs-grid {
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  }
+}
+  </style>
+  const app = {
+    currentUser: null,
+    map: null,
+    scrollInterval: null,
+
+    qs(selector) { return document.querySelector(selector); },
+    qsa(selector) { return Array.from(document.querySelectorAll(selector)); },
+    
+    safeAddEvent(el, event, handler) { 
+        if (el) el.addEventListener(event, handler); 
+    },
+
+    async checkAuth() {
+        try {
+            const resp = await fetch('/api/me');
+            if (resp.ok) {
+                const user = await resp.json();
+                this.currentUser = user;
+                
+                this.loadNotifications();
+            } else {
+                this.currentUser = null;
+            }
+        } catch (err) {
+            this.currentUser = null;
+            console.warn('checkAuth error', err);
+        }
+        this.updateUserInterface();
+    },
+
+    updateUserInterface() {
+        const userProfileText = this.qs('#user-profile-text');
+        const notificationBell = this.qs('#notification-bell');
+        
+        if (this.currentUser) {
+            if (userProfileText) {
+                userProfileText.textContent = this.currentUser.username || this.currentUser.email;
+            }
+            if (notificationBell) {
+                notificationBell.style.display = 'flex';
+            }
+        } else {
+            if (userProfileText) {
+                userProfileText.textContent = 'Личный кабинет';
+            }
+            if (notificationBell) {
+                notificationBell.style.display = 'none';
+            }
+            this.updateNotificationBadge(0);
+        }
+    },
+
+    getNotificationsKey() {
+        if (!this.currentUser) return null;
+        return `user_notifications_${this.currentUser.id}`;
+    },
+
+    createWelcomeNotification() {
+        try {
+            if (!this.currentUser) return;
+            
+            const notificationsKey = this.getNotificationsKey();
+            const notifications = JSON.parse(localStorage.getItem(notificationsKey) || '[]');
+            
+            const welcomeNotification = {
+                id: Date.now(),
+                title: 'Добро пожаловать!',
+                message: `Вы успешно зарегистрировались в системе личного кабинета как ${this.currentUser.username}. Теперь вам доступны все функции сайта.`,
+                time: 'Только что',
+                read: false,
+                type: 'welcome',
+                createdAt: new Date().toISOString()
+            };
+            
+            notifications.unshift(welcomeNotification);
+            
+            localStorage.setItem(notificationsKey, JSON.stringify(notifications));
+            
+            console.log('Приветственное уведомление создано для пользователя:', this.currentUser.id);
+        } catch (err) {
+            console.error('Ошибка создания уведомления:', err);
+        }
+    },
+
+    async loadNotifications() {
+        if (!this.currentUser) {
+            this.displayNotifications([]);
+            return;
+        }
+        
+        try {
+            const notificationsKey = this.getNotificationsKey();
+            const notifications = JSON.parse(localStorage.getItem(notificationsKey) || '[]');
+            
+            const updatedNotifications = notifications.map(notification => ({
+                ...notification,
+                time: this.formatTimeAgo(notification.createdAt)
+            }));
+            
+            this.displayNotifications(updatedNotifications);
+        } catch (err) {
+            console.error('Ошибка загрузки уведомлений:', err);
+            this.displayNotifications([]);
+        }
+    },
+
+    markNotificationAsRead(notificationId) {
+        try {
+            if (!this.currentUser) return;
+            
+            const notificationsKey = this.getNotificationsKey();
+            const notifications = JSON.parse(localStorage.getItem(notificationsKey) || '[]');
+            const updatedNotifications = notifications.map(notification => 
+                notification.id == notificationId ? { ...notification, read: true } : notification
+            );
+            
+            localStorage.setItem(notificationsKey, JSON.stringify(updatedNotifications));
+            
+            const notificationItem = this.qs(`.notification-item[data-id="${notificationId}"]`);
+            if (notificationItem) {
+                notificationItem.classList.remove('unread');
+                
+                const currentCount = parseInt(this.qs('#notification-badge').textContent) || 0;
+                const newCount = Math.max(0, currentCount - 1);
+                this.updateNotificationBadge(newCount);
+            }
+        } catch (err) {
+            console.error('Ошибка отметки уведомления как прочитанного:', err);
+        }
+    },
+
+    setupAuthForms() {
+        const registerForm = this.qs('#register-form');
+        const loginForm = this.qs('#login-form');
+
+        if (registerForm) {
+            this.safeAddEvent(registerForm, 'submit', async (e) => {
+                e.preventDefault();
+                
+                const email = document.getElementById('register-email').value;
+                const username = document.getElementById('register-username').value;
+                const password = document.getElementById('register-password').value;
+                const passwordRepeat = document.getElementById('register-password-repeat').value;
+
+                if (password !== passwordRepeat) {
+                    this.showMessage('Пароли не совпадают', 'error');
+                    return;
+                }
+
+                try {
+                    const res = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, username, password, passwordRepeat })
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        this.showMessage(data.error, 'error');
+                        return;
+                    }
+
+                    document.getElementById('register-success').style.display = 'block';
+
+                    setTimeout(() => {
+                        this.closeModalById('register-modal');
+                        this.checkAuth().then(() => {
+                            this.createWelcomeNotification();
+                            this.showMessage('Успешная регистрация!', 'success');
+                        });
+                    }, 1200);
+                } catch (err) {
+                    this.showMessage('Ошибка сети', 'error');
+                }
+            });
+        }
+
+        if (loginForm) {
+            this.safeAddEvent(loginForm, 'submit', async (e) => {
+                e.preventDefault();
+                
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                try {
+                    const res = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        this.showMessage(data.error, 'error');
+                        return;
+                    }
+
+                    this.closeModalById('login-modal');
+                    this.checkAuth();
+                    this.showMessage('Успешный вход!', 'success');
+                } catch (err) {
+                    this.showMessage('Ошибка сети', 'error');
+                }
+            });
+        }
+    },
+
+    
+    openModalById(id) {
+        this.qsa('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+        
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'block';
+            el.style.zIndex = '10000';
+            if (el.querySelector('.modal-content')) {
+                el.querySelector('.modal-content').style.zIndex = '10001';
+            }
+        }
+    },
+
+    closeModalById(id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    },
+
+    closeModal(modalId) {
+        this.closeModalById(modalId);
+    },
+
+    setupCloseModalButtons() {
+        this.qsa('.close-modal').forEach(btn => {
+            this.safeAddEvent(btn, 'click', (e) => {
+                const modalId = btn.dataset.modal;
+                if (modalId) {
+                    this.closeModalById(modalId);
+                } else {
+                    const modal = btn.closest('.modal');
+                    if (modal) modal.style.display = 'none';
+                }
+            });
+        });
+    },
+
+    setupWindowModalClick() {
+        this.safeAddEvent(window, 'click', (e) => {
+            if (e.target && e.target.classList && e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+    },
+
+    showMessage(message, type = 'success') {
+        const old = this.qsa('.error-message, .success-message');
+        old.forEach(o => o.remove());
+
+        const div = document.createElement('div');
+        div.className = type === 'error' ? 'error-message' : 'success-message';
+        div.textContent = message;
+
+        const activeModal = this.qsa('.modal').find(m => m.style.display === 'block');
+        if (activeModal) {
+            const form = activeModal.querySelector('form');
+            if (form) form.insertBefore(div, form.firstChild);
+            else activeModal.querySelector('.modal-content').prepend(div);
+        } else {
+            document.body.appendChild(div);
+        }
+
+        setTimeout(() => div.remove(), 5000);
+    },
+
+    switchToLogin() {
+        this.closeModalById('register-modal');
+        this.openModalById('login-modal');
+    },
+
+    switchToRegister() {
+        this.closeModalById('login-modal');
+        this.openModalById('register-modal');
+    },
+
+    initMapIfNeeded() {
+        if (this.map) return;
+        if (!window.ymaps) {
+            console.warn('ymaps not loaded');
+            return;
+        }
+        
+        const latitude = 59.916809;
+        const longitude = 30.310717;
+
+        ymaps.ready(() => {
+            try {
+                this.map = new ymaps.Map('map', {
+                    center: [latitude, longitude],
+                    zoom: 16,
+                    controls: ['zoomControl']
+                }, {
+                    suppressMapOpenBlock: true,
+                    suppressObsoleteBrowserNotifier: true,
+                    yandexMapDisablePoiInteractivity: true
+                });
+
+                this.map.behaviors.disable([
+                    'rightMouseButtonMagnifier',
+                    'dblClickZoom'
+                ]);
+                
+                const marker = new ymaps.Placemark([latitude, longitude], {
+                    hintContent: 'Кафедра О7',
+                    balloonContent: '1-я Красноармейская улица, 13В<br>Учебно-лабораторный корпус, 2 этаж'
+                }, {
+                    preset: 'islands#blueIcon'
+                });
+
+                this.map.geoObjects.add(marker);
+                
+                console.log('✅ Карта инициализирована на странице контактов');
+            } catch (err) {
+                console.error('ymaps init error', err);
+            }
+        });
+    },
+
+    
+    formatTimeAgo(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Только что';
+        if (diffMins < 60) return `${diffMins} мин. назад`;
+        if (diffHours < 24) return `${diffHours} ч. назад`;
+        if (diffDays === 1) return 'Вчера';
+        if (diffDays < 7) return `${diffDays} дн. назад`;
+        
+        return date.toLocaleDateString('ru-RU');
+    },
+
+    fillEvents(eventsData) {
+        const evWrap = this.qs('#events-container');
+        if (!evWrap) return;
+        
+        evWrap.innerHTML = '';
+        eventsData.forEach(e => {
+            const d = document.createElement('div');
+            d.className = 'event';
+            d.innerHTML = `
+                <div class="event-date">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 7V3M16 7V3M7 11H17M5 21H19C20.1046 21 21 20.1046 21 19V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V19C3 20.1046 3.89543 21 5 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    ${e.date}, ${e.time}
+                </div>
+                <div class="event-place">${e.place}</div>
+                <div class="event-desc">${e.desc}</div>`;
+            evWrap.appendChild(d);
+        });
+    },
+
+    generateCurrentEvents() {
+        const now = new Date();
+        const events = [];
+        
+        for (let i = 1; i <= 5; i++) {
+            const eventDate = new Date(now);
+            eventDate.setDate(now.getDate() + i);
+            
+            const days = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+            const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+            
+            const dateStr = `${eventDate.getDate()} ${months[eventDate.getMonth()]}`;
+            const timeOptions = ['10:00', '12:00', '14:00', '16:00', '18:00'];
+            const places = ['Ауд. 302', 'Актовый зал', 'Онлайн', 'Лаб. 204', 'Ауд. 415'];
+            const descriptions = [
+                'Мастер-класс по Python и анализу данных',
+                'День открытых дверей кафедры',
+                'Вебинар по кибербезопасности',
+                'Практикум по нейросетям и машинному обучению',
+                'Семинар по разработке мобильных приложений'
+            ];
+            
+            events.push({
+                date: dateStr,
+                time: timeOptions[i-1],
+                place: places[i-1],
+                desc: descriptions[i-1]
+            });
+        }
+        
+        return events;
+    },
+
+    setupContactForm() {
+        const feedbackForm = this.qs('#feedback-form');
+
+        if (feedbackForm) {
+            this.safeAddEvent(feedbackForm, 'submit', (e) => {
+                e.preventDefault();
+                const fd = new FormData(feedbackForm);
+                const payload = {
+                    name: fd.get('name'),
+                    email: fd.get('email'),
+                    subject: fd.get('subject'),
+                    message: fd.get('message')
+                };
+                
+                this.saveContactFormToDB(payload);
+                
+                console.log('Данные формы:', payload);
+                alert('Ваше сообщение отправлено! Мы свяжемся с вами в ближайшее время.');
+                feedbackForm.reset();
+            });
+        }
+    },
+
+    saveContactFormToDB(formData) {
+        try {
+            const existingData = JSON.parse(localStorage.getItem('contact_forms') || '[]');
+            
+            const newEntry = {
+                ...formData,
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                status: 'new'
+            };
+            
+            existingData.push(newEntry);
+            localStorage.setItem('contact_forms', JSON.stringify(existingData));
+            
+            console.log('Форма сохранена в БД (localStorage):', newEntry);
+        } catch (err) {
+            console.error('Ошибка сохранения формы:', err);
+        }
+    },
+
+    setupScheduleModal() {
+        const scheduleModal = this.qs('#schedule-modal');
+        const scheduleBlock = this.qs('.schedule-block');
+        const consultationsLink = this.qs('#consultations-link');
+        const breadcrumbs = this.qs('#breadcrumbs');
+        
+        const mainContent = this.qs('#main-content');
+        
+        const consultationsPage = this.qs('#consultations-page');
+        const breadcrumbMain = this.qs('#breadcrumb-main');
+
+        if (scheduleBlock && scheduleModal) {
+            this.safeAddEvent(scheduleBlock, 'click', () => { 
+                scheduleModal.style.display = 'block'; 
+            });
+        }
+
+        if (consultationsLink) {
+            this.safeAddEvent(consultationsLink, 'click', (e) => {
+                e.preventDefault();
+                if (scheduleModal) scheduleModal.style.display = 'none';
+                if (mainContent) mainContent.style.display = 'none';
+                if (consultationsPage) consultationsPage.style.display = 'block';
+                if (breadcrumbs) breadcrumbs.style.display = 'block';
+                
+                window.history.pushState({ page: 'consultations' }, '', '/consultations');
+            });
+        }
+
+        if (breadcrumbMain) {
+            this.safeAddEvent(breadcrumbMain, 'click', (e) => {
+                e.preventDefault();
+                this.showMainPage();
+            });
+        }
+
+        window.addEventListener('popstate', (event) => {
+            const path = window.location.pathname;
+            if (path === '/consultations') {
+                this.showConsultationsPage();
+            } else if (path === '/contacts') {
+                this.showContactsPage();
+            } else {
+                this.showMainPage();
+            }
+        });
+    },
+
+    showMainPage() {
+        const mainContent = this.qs('#main-content');
+        const consultationsPage = this.qs('#consultations-page');
+        const contactsPage = this.qs('#contacts-page');
+        const breadcrumbs = this.qs('#breadcrumbs');
+        const scheduleModal = this.qs('#schedule-modal');
+
+        if (mainContent) mainContent.style.display = 'block';
+        if (consultationsPage) consultationsPage.style.display = 'none';
+        if (contactsPage) contactsPage.style.display = 'none';
+        if (breadcrumbs) breadcrumbs.style.display = 'none';
+        if (scheduleModal) scheduleModal.style.display = 'none';
+        
+        window.history.pushState({ page: 'main' }, '', '/');
+    },
+
+    showConsultationsPage() {
+        const mainContent = this.qs('#main-content');
+        const consultationsPage = this.qs('#consultations-page');
+        const contactsPage = this.qs('#contacts-page');
+        const breadcrumbs = this.qs('#breadcrumbs');
+        const scheduleModal = this.qs('#schedule-modal');
+
+        if (mainContent) mainContent.style.display = 'none';
+        if (consultationsPage) consultationsPage.style.display = 'block';
+        if (contactsPage) contactsPage.style.display = 'none';
+        if (breadcrumbs) breadcrumbs.style.display = 'block';
+        if (scheduleModal) scheduleModal.style.display = 'none';
+        
+        window.history.pushState({ page: 'consultations' }, '', '/consultations');
+    },
+
+    showContactsPage() {
+        const mainContent = this.qs('#main-content');
+        const consultationsPage = this.qs('#consultations-page');
+        const contactsPage = this.qs('#contacts-page');
+        const breadcrumbs = this.qs('#breadcrumbs');
+        const scheduleModal = this.qs('#schedule-modal');
+
+        if (mainContent) mainContent.style.display = 'none';
+        if (consultationsPage) consultationsPage.style.display = 'none';
+        if (contactsPage) contactsPage.style.display = 'block';
+        if (breadcrumbs) breadcrumbs.style.display = 'none';
+        if (scheduleModal) scheduleModal.style.display = 'none';
+        
+        setTimeout(() => {
+            this.initMapIfNeeded();
+        }, 100);
+        
+        window.history.pushState({ page: 'contacts' }, '', '/contacts');
+    },
+
+    setupMapToggle() {
+        const mapContainer = this.qs('#map-container');
+        const addressLink = this.qs('#address-link');
+        const closeMap = this.qs('#close-map');
+
+        if (addressLink && mapContainer) {
+            this.safeAddEvent(addressLink, 'click', (e) => {
+                e.preventDefault();
+                mapContainer.classList.add('expanded');
+                this.initMapIfNeeded();
+            });
+        }
+
+        if (closeMap && mapContainer) {
+            this.safeAddEvent(closeMap, 'click', () => {
+                mapContainer.classList.remove('expanded');
+            });
+        }
+    },
+
+    setupPrivacyPage() {
+        const privacyLink = this.qs('#privacy-link');
+        const footerPrivacyLink = this.qs('#footer-privacy-link');
+        
+        const mainContent = this.qs('#main-content');
+        
+        const privacySection = this.qs('#privacy');
+        const breadcrumbs = this.qs('#breadcrumbs');
+
+        const showPrivacyPage = () => {
+            if (mainContent) mainContent.style.display = 'none';
+            if (privacySection) privacySection.style.display = 'block';
+            if (breadcrumbs) {
+                breadcrumbs.style.display = 'block';
+                breadcrumbs.innerHTML = `
+                    <ul>
+                        <li><a href="/" id="breadcrumb-main-privacy">Главная</a></li>
+                        <li><span>Политика конфиденциальности</span></li>
+                    </ul>
+                `;
+                
+                const mainBreadcrumb = this.qs('#breadcrumb-main-privacy');
+                if (mainBreadcrumb) {
+                    this.safeAddEvent(mainBreadcrumb, 'click', (e) => {
+                        e.preventDefault();
+                        this.showMainPage();
+                    });
+                }
+            }
+            
+            const footer = this.qs('footer');
+            if (footer) footer.style.display = 'none';
+        };
+
+        const showMainPage = () => {
+            if (mainContent) mainContent.style.display = 'block';
+            if (privacySection) privacySection.style.display = 'none';
+            if (breadcrumbs) breadcrumbs.style.display = 'none';
+            
+            const footer = this.qs('footer');
+            if (footer) footer.style.display = 'block';
+        };
+
+        if (privacyLink) {
+            this.safeAddEvent(privacyLink, 'click', (e) => {
+                e.preventDefault();
+                showPrivacyPage();
+            });
+        }
+
+        if (footerPrivacyLink) {
+            this.safeAddEvent(footerPrivacyLink, 'click', (e) => {
+                e.preventDefault();
+                showPrivacyPage();
+            });
+        }
+    },
+
+    setupNotifications() {
+        const notificationBell = this.qs('#notification-bell');
+        const notificationsModal = this.qs('#notifications-modal');
+
+        if (notificationBell && notificationsModal) {
+            this.safeAddEvent(notificationBell, 'click', (e) => {
+                e.stopPropagation();
+                if (this.currentUser) {
+                    this.loadNotifications();
+                    notificationsModal.style.display = 'block';
+                }
+            });
+        }
+    },
+
+    displayNotifications(notifications) {
+        const container = this.qs('#notifications-list');
+        if (!container) return;
+
+        // Фильтруем только непрочитанные уведомления для бейджа
+        const unreadCount = notifications.filter(n => !n.read).length;
+        this.updateNotificationBadge(unreadCount);
+
+        if (notifications.length === 0) {
+            container.innerHTML = `
+                <div class="notification-item">
+                    <div class="notification-text" style="text-align: center; color: var(--text-muted);">
+                        Уведомлений нет
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = notifications.map(notification => `
+            <div class="notification-item ${notification.read ? '' : 'unread'}" 
+                 data-id="${notification.id}">
+                <div class="notification-title">${notification.title}</div>
+                <div class="notification-text">${notification.message}</div>
+                <div class="notification-time">${notification.time}</div>
+            </div>
+        `).join('');
+
+        // Добавляем обработчики кликов для уведомлений
+        this.qsa('.notification-item').forEach(item => {
+            this.safeAddEvent(item, 'click', () => {
+                this.markNotificationAsRead(item.dataset.id);
+            });
+        });
+    },
+
+    updateNotificationBadge(count) {
+        const badge = this.qs('#notification-badge');
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count > 99 ? '99+' : count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    },
+
+    setupUserProfile() {
+        const userProfileEl = this.qs('#user-profile');
+        const logoutBtn = this.qs('#logout-btn');
+
+        if (userProfileEl) {
+            this.safeAddEvent(userProfileEl, 'click', () => {
+                if (this.currentUser) {
+                    this.openModalById('profile-modal');
+                    const uName = this.qs('#profile-username');
+                    const uEmail = this.qs('#profile-email');
+                    const uRole = this.qs('#profile-role');
+                    if (uName) uName.textContent = this.currentUser.username || '';
+                    if (uEmail) uEmail.textContent = this.currentUser.email || '';
+                    if (uRole) uRole.textContent = this.currentUser.role || 'Пользователь';
+                } else {
+                    this.openModalById('login-modal');
+                }
+            });
+        }
+
+        if (logoutBtn) {
+            this.safeAddEvent(logoutBtn, 'click', async () => {
+                try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    this.currentUser = null;
+                    this.updateUserInterface();
+                    this.closeModalById('profile-modal');
+                    this.showMessage('Вы вышли из системы', 'success');
+                } catch (err) {
+                    this.showMessage('Ошибка при выходе', 'error');
+                }
+            });
+        }
+    },
+
+    setupContactsNavigation() {
+        const contactsLink = this.qs('#contacts-link');
+        const contactsBackButton = this.qs('#contacts-back-button');
+        const contactFormToggle = this.qs('#contact-form-toggle');
+        const backButton = this.qs('#back-button');
+
+        if (contactsLink) {
+            this.safeAddEvent(contactsLink, 'click', (e) => {
+                e.preventDefault();
+                this.showContactsPage();
+            });
+        }
+
+        if (contactsBackButton) {
+            this.safeAddEvent(contactsBackButton, 'click', (e) => {
+                e.preventDefault();
+                this.showMainPage();
+            });
+        }
+
+        if (backButton) {
+            this.safeAddEvent(backButton, 'click', (e) => {
+                e.preventDefault();
+                this.showMainPage();
+            });
+        }
+
+        if (contactFormToggle) {
+            this.safeAddEvent(contactFormToggle, 'click', (e) => {
+                e.preventDefault();
+                const contactForm = this.qs('.contact-form');
+                if (contactForm) {
+                    contactForm.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
+    },
+
+    async init() {
+        console.log('Инициализация приложения...');
+        
+        await this.checkAuth();
+        
+        this.setupCloseModalButtons();
+        this.setupWindowModalClick();
+        this.setupAuthForms();
+        this.setupContactForm();
+        this.setupScheduleModal();
+        this.setupMapToggle();
+        this.setupPrivacyPage();
+        this.setupNotifications();
+        this.setupUserProfile();
+        this.setupContactsNavigation();
+
+        // Проверяем текущий URL при загрузке
+        const path = window.location.pathname;
+        if (path === '/contacts') {
+            this.showContactsPage();
+        } else if (path === '/consultations') {
+            this.showConsultationsPage();
+        } else {
+            this.showMainPage();
+        }
+
+        // Заполняем мероприятия актуальными датами
+        const currentEvents = this.generateCurrentEvents();
+        this.fillEvents(currentEvents);
+
+        console.log('Приложение инициализировано');
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    app.init();
+});
+  <script>
+  </script>
+  
   <script src="/script.js"></script>
 </head>
 <body>
