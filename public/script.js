@@ -12,30 +12,16 @@ const app = {
     // Аутентификация
     async checkAuth() {
         try {
-            const token = localStorage.getItem('auth_token');
-            if (!token) {
-                this.currentUser = null;
-                this.updateUserInterface();
-                return;
-            }
-
-            const resp = await fetch('/api/me', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
+            const resp = await fetch('/api/me');
             if (resp.ok) {
                 const user = await resp.json();
                 this.currentUser = user;
                 this.loadNotifications();
             } else {
                 this.currentUser = null;
-                localStorage.removeItem('auth_token');
             }
         } catch (err) {
             this.currentUser = null;
-            localStorage.removeItem('auth_token');
             console.warn('checkAuth error', err);
         }
         this.updateUserInterface();
@@ -230,13 +216,10 @@ const app = {
                     const data = await res.json();
 
                     if (!res.ok) {
-                        this.showMessage(data.detail, 'error');
+                        this.showMessage(data.error, 'error');
                         return;
                     }
 
-                    // Сохраняем токен
-                    localStorage.setItem('auth_token', data.access_token);
-                    
                     document.getElementById('register-success').style.display = 'block';
 
                     setTimeout(() => {
@@ -269,13 +252,10 @@ const app = {
                     const data = await res.json();
 
                     if (!res.ok) {
-                        this.showMessage(data.detail, 'error');
+                        this.showMessage(data.error, 'error');
                         return;
                     }
 
-                    // Сохраняем токен
-                    localStorage.setItem('auth_token', data.access_token);
-                    
                     this.closeModalById('login-modal');
                     this.checkAuth();
                     this.showMessage('Успешный вход!', 'success');
@@ -637,7 +617,7 @@ const app = {
         if (logoutBtn) {
             this.safeAddEvent(logoutBtn, 'click', async () => {
                 try {
-                    localStorage.removeItem('auth_token');
+                    await fetch('/api/logout', { method: 'POST' });
                     this.currentUser = null;
                     this.updateUserInterface();
                     this.closeModalById('profile-modal');
